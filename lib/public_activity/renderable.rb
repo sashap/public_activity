@@ -89,7 +89,7 @@ module PublicActivity
         layout = layout.to_s
         layout = layout[0,8] == "layouts/" ? layout : "layouts/#{layout}"
       end
-      context.prepend_view_path "app/views/public_activity"
+
       self.prepend_view_paths(controller, self.key)
       context.render :partial => (partial_path || self.template_path(self.key)),
         :layout => layout,
