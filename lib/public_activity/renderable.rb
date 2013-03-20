@@ -89,6 +89,8 @@ module PublicActivity
         layout = layout.to_s
         layout = layout[0,8] == "layouts/" ? layout : "layouts/#{layout}"
       end
+      context.prepend_view_path "app/views/public_activity"
+      self.prepend_view_paths(controller, self.key)
       context.render :partial => (partial_path || self.template_path(self.key)),
         :layout => layout,
         :locals =>
@@ -100,15 +102,27 @@ module PublicActivity
     end
 
     protected
+    # Prepend view paths - to allow cascading from specific folder
+    # within apps/views/public_activity/ to more general
+    def prepend_view_paths(controller, key)
+      prepend_path = "app/views/public_activity"
+      path = key.split(".")
+      path.delete_at(0) if path[0] == "activity"
+      path.each do |segment|
+        controller.prepend_view_path prepend_path
+        prepend_path = prepend_path + "/" + segment
+      end
+    end
+    
     # Builds the path to template based on activity key
     # TODO: verify that attribute `key` is splitted by commas
     #       and that the word before first comma is equal to
     #       "activity"
     def template_path(key)
-      path = key.split(".")
-      path.delete_at(0) if path[0] == "activity"
-      path.unshift "public_activity"
-      path.join("/")
+      path = key.split(".").last
+      # path.delete_at(0) if path[0] == "activity"
+      # path.unshift "public_activity"
+      # path.join("/")
     end
   end
 end
