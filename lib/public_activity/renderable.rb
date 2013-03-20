@@ -91,14 +91,18 @@ module PublicActivity
       end
 
       self.prepend_view_paths(controller, self.key)
-      context.render :partial => (partial_path || self.template_path(self.key)),
-        :layout => layout,
-        :locals =>
-          {:a => self, :activity => self,
-           :controller => controller,
-           :current_user => controller.respond_to?(:current_user) ?
-                controller.current_user : nil ,
-           :p => params_indifferent, :params => params_indifferent}
+      begin
+        context.render :partial => (partial_path || self.template_path(self.key)),
+          :layout => layout,
+          :locals =>
+            {:a => self, :activity => self,
+             :controller => controller,
+             :current_user => controller.respond_to?(:current_user) ?
+                  controller.current_user : nil ,
+             :p => params_indifferent, :params => params_indifferent}
+      rescue ActionView::MissingTemplate
+        context.render :text => self.text(params)
+      end
     end
 
     protected
